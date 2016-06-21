@@ -39,7 +39,10 @@ def get_bed_region(line):
     # bed: 0 index, inclusive start, exlusive end
 
     # starting postion of the line in bed index
-    line_start = POS - 1
+    if POS == 0:
+        line_start = 0
+    else:
+        line_start = POS - 1
     # ending position of the line in bed index
     if has_END(line):
         line_end = get_END(line)
