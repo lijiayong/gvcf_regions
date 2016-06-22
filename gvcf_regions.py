@@ -8,15 +8,15 @@ def is_header(line):
     return line.startswith('#')
 
 def has_END(line):
-    """Check if a line has the 'END' tag."""
+    """Check if a line has the 'END=' tag."""
 
-    return line.find('END') != -1
+    return line.find('END=') != -1
 
 # FIELD index
 # CHROM 0, POS 1, REF 3, QUAL 5, INFO 7, FORMAT 8, sample 9
 
 def get_END(line):
-    """Extract the END position of a line from the 'END' tag under INFO."""
+    """Extract the END position of a line from the 'END=' tag under INFO."""
 
     INFO = line.strip().split('\t')[7]
     INFO_fields = INFO.split(';')
