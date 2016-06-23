@@ -57,8 +57,12 @@ def get_GQ(line):
     FORMAT, sample = fields[8], fields[9]
     FORMAT_fields = FORMAT.split(':'); sample_fields = sample.split(':')
 
-    GQ_index = FORMAT_fields.index('GQ')
-    GQ = int(sample_fields[GQ_index])
+    # No genotype quality present in gVCF. Happens in some lines of GATK gVCF output.
+    try:
+        GQ_index = FORMAT_fields.index('GQ')
+        GQ = int(sample_fields[GQ_index])
+    except ValueError:
+        GQ = 0
     return GQ
 
 def is_considered(line, ignore_phrases):
@@ -124,6 +128,7 @@ def gvcf_regions(gvcf, unreported_is_called, ignore_phrases,
             CHROM = fields[0]
             is_line_called = is_called(line, min_GQ, min_QUAL, pass_phrases)
             (line_start, line_end) = get_bed_region(line)
+            assert line_end is not None, line
 
             # handle cases depending on if the previous block is called,
             # if the current line is called, and if the previous block
