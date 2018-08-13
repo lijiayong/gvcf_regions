@@ -10,7 +10,7 @@ def is_header(line):
 def has_END(line):
     """Check if a line has the 'END=' tag."""
 
-    return line.find('END=') != -1
+    return 'END=' in line
 
 # FIELD index
 # CHROM 0, POS 1, REF 3, QUAL 5, INFO 7, FORMAT 8, sample 9
@@ -55,7 +55,8 @@ def get_GQ(line):
 
     fields = line.strip().split('\t')
     FORMAT, sample = fields[8], fields[9]
-    FORMAT_fields = FORMAT.split(':'); sample_fields = sample.split(':')
+    FORMAT_fields = FORMAT.split(':')
+    sample_fields = sample.split(':')
 
     # No genotype quality present in gVCF. Happens in some lines of GATK gVCF output.
     try:
@@ -75,7 +76,7 @@ def is_considered(line, ignore_phrases):
 
     if ignore_phrases != None:
         for ignore_phrase in ignore_phrases:
-            if line.find(ignore_phrase) != -1:
+            if ignore_phrase in line:
                 return False
     return True
 
@@ -96,7 +97,7 @@ def is_called(line, min_GQ, min_QUAL, pass_phrases):
     line_has_pass_phrases = True
     if pass_phrases != None:
         for pass_phrase in pass_phrases:
-            if line.find(pass_phrase) != -1:
+            if pass_phrase in line:
                 line_has_pass_phrases = True
                 break
             else:
