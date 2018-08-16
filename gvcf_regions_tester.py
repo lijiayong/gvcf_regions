@@ -6,8 +6,6 @@ f_line1 = 'chr22	14257	.	CTG	C	26.01	PASS	AC=2;AF=1;AN=2;DECOMPOSED;GC=53.47;HRu
 f_line2 = 'chr22	14273	.	C	<*>	0	PASS	AC=0;AF=nan;AN=0;DP=3;END=14282;GC=52.48;MIN=3;MQ=71.25;NS=1	DP:GQ:MIN:QA:QR	3:99:3:0:1203'
 g_line1 = '1	63735	.	CCTA	C,<NON_REF>	41.73	.	BaseQRankSum=0.736;ClippingRankSum=0.736;DP=3;MLEAC=1,0;MLEAF=0.500,0.00;MQ=41.10;MQ0=0;MQRankSum=0.736;ReadPosRankSum=0.736	GT:AD:DP:GQ:PL:SB	0/1:1,2,0:3:45:81,0,45,84,51,135:0,1,0,2'
 g_line2 = '1	63739	.	C	<NON_REF>	.	.	END=63739	GT:DP:GQ:MIN_DP:PL	0/0:3:0:3:0,0,0'
-p_line1 = '1	30867	.	CCTCT	C	49	PASS	BRF=0.0;FR=0.9990;HP=2;HapScore=2;MGOF=20;MMLQ=16;MQ=60.0;NF=0;NR=1;PP=49;QD=53.0;SC=TCTGTGTCTCCCTCTCTCTCT;SbPval=1.0;Source=Platypus;TC=1;TCF=0;TCR=1;TR=1;WE=30879;WS=30857	GT:GL:GOF:GQ:NR:NV	./.:-5.1,-0.0,0.0:20:3:1:1'
-p_line2 = '1	30872	.	C	N	5	REFCALL	BRF=.;END=31871;FR=.;FS=.;HP=.;HapScore=.;MGOF=.;MMLQ=.;MQ=.;NF=.;NR=.;PP=.;QD=.;ReadPosRankSum=.;SC=.;START=.;SbPval=.;Size=1000;Source=.;TC=.;TCF=.;TCR=.;TR=.;WE=.;WS=.	GT:GL:GOF:GQ:NR:NV	./.:-1,-1,-1:-1:-1:2:0'
 
 import unittest
 import gvcf_regions
@@ -38,10 +36,6 @@ class gvcfRegionsTest(unittest.TestCase):
         self.assertEqual(gvcf_regions.is_called(g_line1, 45, None, None), True)
         self.assertEqual(gvcf_regions.is_called(g_line1, 46, None, None), False)
         self.assertEqual(gvcf_regions.is_called(g_line1, 45, None, ['PASS']), False)
-        self.assertEqual(gvcf_regions.is_called(p_line1, None, 49, ['PASS']), True)
-        self.assertEqual(gvcf_regions.is_called(p_line1, None, 50, ['PASS']), False)
-        self.assertEqual(gvcf_regions.is_called(p_line1, None, 49, ['REFCALL']), False)
-        self.assertEqual(gvcf_regions.is_called(p_line1, None, 49, ['PASS', 'REFCALL']), True)
 
 if __name__ == '__main__':
     unittest.main()

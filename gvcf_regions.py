@@ -66,6 +66,22 @@ def get_GQ(line):
         GQ = 0
     return GQ
 
+def get_GT(line):
+    """Extract the GT (Genotype) of a line."""
+
+    fields = line.strip().split('\t')
+    FORMAT, sample = fields[8], fields[9]
+    FORMAT_fields = FORMAT.split(':')
+    sample_fields = sample.split(':')
+
+    try:
+        GT_index = FORMAT_fields.index('GT')
+        GT = sample_fields[GT_index]
+    except ValueError:
+        GT = None
+    return GT
+
+
 def is_considered(line, ignore_phrases):
     """Check if a line should be considered. A line that contains any of the
     ignore phrases is discarded. E.g., to discard CNV and ME lines of Complete Genomics
@@ -82,8 +98,9 @@ def is_considered(line, ignore_phrases):
 
 def is_called(line, min_GQ, min_QUAL, pass_phrases):
     """Check if a line is considered as 'called', i.e., if its GQ is at least
-    min_GQ, if its QUAL is at least min_QUAL, and if it contains any of the
-    pass phrases. E.g., for platypus gvcf, set pass_phrases = ['PASS', 'REFCALL'].
+    min_GQ, if its QUAL is at least min_QUAL, if it contains any of the
+    pass phrases, E.g., for freebayes gvcf, set pass_phrases = ['PASS'],
+    and if the GT field has no '.' (no call).
 
     Args:
         min_GQ (None or int)
@@ -103,7 +120,13 @@ def is_called(line, min_GQ, min_QUAL, pass_phrases):
             else:
                 line_has_pass_phrases = False
 
-    return GQ_passes and QUAL_passes and line_has_pass_phrases
+    GT = get_GT(line)
+    if GT:
+        GT_without_nocall = not ('.' in GT)
+    else:
+        GT_without_nocall = True
+
+    return GQ_passes and QUAL_passes and line_has_pass_phrases and GT_without_nocall
 
 def gvcf_regions(gvcf, unreported_is_called, ignore_phrases,
                         min_GQ, min_QUAL, pass_phrases):
@@ -112,8 +135,7 @@ def gvcf_regions(gvcf, unreported_is_called, ignore_phrases,
     Args:
         unreported_is_called (bool): whether an unreported site is considered
             as called. E.g., in Complete Genomics gvcf, an unreported site
-            is hom-ref (called), whereas in freebayes/gatk/platypus
-            gvcf, it is no-call.
+            is hom-ref (called), whereas in freebayes/gatk gvcf, it is no-call.
         ignore_phrases (None or non-empty list)
         min_GQ (None or int)
         min_QUAL (None or float)
@@ -231,18 +253,16 @@ if __name__ == '__main__':
     complete_genomics_preset = [True, ['CNV', 'INS:ME'], None, None, ['PASS']]
     freebayes_preset = [False, None, None, None, ['PASS']]
     gatk_preset = [False, None, 5, None, None]
-    platypus_preset = [False, None, None, None, ['PASS', 'REFCALL']]
 
     gvcf_type_help = '''type of gvcf output.
             [unreported_is_called, ignore_phrases, min_GQ, min_QUAL, pass_phrases] presets:
             complete_genomics: %s.
             freebayes: %s.
-            gatk: %s.
-            platypus: %s.''' % (complete_genomics_preset,
-                freebayes_preset, gatk_preset, platypus_preset)
+            gatk: %s.''' % (complete_genomics_preset,
+                freebayes_preset, gatk_preset)
 
     parser.add_argument("--gvcf_type",
-        choices=['complete_genomics', 'freebayes', 'gatk', 'platypus'], help=gvcf_type_help)
+        choices=['complete_genomics', 'freebayes', 'gatk'], help=gvcf_type_help)
     args = parser.parse_args()
 
     par = [args.unreported_is_called, args.ignore_phrases,
@@ -254,8 +274,6 @@ if __name__ == '__main__':
         par = freebayes_preset
     elif args.gvcf_type == 'gatk':
         par = gatk_preset
-    elif args.gvcf_type == 'platypus':
-        par = platypus_preset
 
     all_par = [args.gvcf] + par
     gvcf_regions(*all_par)
