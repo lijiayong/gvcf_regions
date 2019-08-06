@@ -245,7 +245,7 @@ if __name__ == '__main__':
         help='minimum GQ (Genotype Quality) considered as called')
     parser.add_argument('--min_QUAL', type=float,
         help='minimum QUAL considered as called')
-    parser.add_argument('--pass_phrases',  nargs='+',
+    parser.add_argument('--pass_phrases', nargs='+',
         help='list of phrases considered as called, e.g., PASS, REFCALL. \
         A line must contain any of the pass phrases to be considered as called.')
 
