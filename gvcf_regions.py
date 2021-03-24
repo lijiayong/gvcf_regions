@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
+import argparse
 import gzip
+import sys
 
 def is_header(line):
     """Check if a line is header."""
@@ -141,7 +143,12 @@ def gvcf_regions(gvcf, unreported_is_called, ignore_phrases,
         min_QUAL (None or float)
         pass_phrases (None or non-empty list)"""
 
-    g = gzip.open(gvcf) if gvcf.endswith(".gz") else open(gvcf)
+    if gvcf == "-":
+        g = sys.stdin
+    elif gvcf.endswith(".gz"):
+        g = gzip.open(gvcf)
+    else:
+        g = open(gvcf)
 
     region_CHROM = ''
     for line in g:
@@ -228,13 +235,14 @@ def gvcf_regions(gvcf, unreported_is_called, ignore_phrases,
             print('\t'.join([region_CHROM,
                 str(region_start), str(region_end)]))
 
-    g.close()
+    if g != "-":
+        g.close()
 
 if __name__ == '__main__':
-    import argparse
     parser = argparse.ArgumentParser(description='Output the called regions \
         of a gvcf file to stdout in bed format.')
-    parser.add_argument('gvcf', metavar='GVCF', help='input gvcf file')
+    parser.add_argument('gvcf', metavar='GVCF', help='input gvcf file, \
+        accept gzipped and unzipped files, or "-" for stream')
 
     parser.add_argument('--unreported_is_called', action='store_true',
         help='use this flag to treat unreported sites as called')
