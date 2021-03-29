@@ -17,7 +17,8 @@ gvcf_regions.py [-h] [--unreported_is_called]
 Output the called regions of a gvcf file to stdout in bed format.
 
 positional arguments:
-  GVCF                  input gvcf file
+  GVCF                  input gvcf file, accept gzipped and unzipped files, or
+                        "-" for stream
 
 optional arguments:
   -h, --help            show this help message and exit
