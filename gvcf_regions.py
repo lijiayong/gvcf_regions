@@ -49,7 +49,7 @@ def get_bed_region(line):
     if has_END(line):
         line_end = get_END(line)
     else:
-        line_end = POS -1 + len(REF)
+        line_end = POS - 1 + len(REF)
     return (line_start, line_end)
 
 def get_GQ(line):
@@ -181,6 +181,8 @@ def gvcf_regions(gvcf, unreported_is_called, ignore_phrases,
                 else:
                     # we assume a chromosome starts with a string of 'N's
                     is_previous_block_called = False
+                # update previous_block_end
+                previous_block_end = line_end
             # when line and previous block are on the same chromosome and
             # they have a gap
             elif line_start > previous_block_end:
@@ -212,9 +214,11 @@ def gvcf_regions(gvcf, unreported_is_called, ignore_phrases,
                         if is_line_called:
                             region_start = line_start
                             is_previous_block_called = True
+                # update previous_block_end
+                previous_block_end = line_end
             # when line and previous block are on the same chromosome and
-            # they have no gap
-            else:
+            # they are back to back without gap
+            elif line_start == previous_block_end:
                 if is_previous_block_called:
                     if not is_line_called:
                         region_end = line_start
@@ -225,8 +229,8 @@ def gvcf_regions(gvcf, unreported_is_called, ignore_phrases,
                     if is_line_called:
                         region_start = line_start
                         is_previous_block_called = True
-            # update previous_block_end
-            previous_block_end = line_end
+                # update previous_block_end
+                previous_block_end = line_end
     # at the end of file, write the previous region
     else:
         # we assume a chromosome ends with a string of 'N's
