@@ -231,6 +231,11 @@ def gvcf_regions(gvcf, unreported_is_called, ignore_phrases,
                         is_previous_block_called = True
                 # update previous_block_end
                 previous_block_end = line_end
+            # when line and previous block overlap
+            else:
+                if (is_previous_block_called and is_line_called and 
+                    line_end > previous_block_end):
+                    previous_block_end = line_end
     # at the end of file, write the previous region
     else:
         # we assume a chromosome ends with a string of 'N's
