@@ -152,6 +152,8 @@ def gvcf_regions(gvcf, unreported_is_called, ignore_phrases,
 
     region_CHROM = ''
     for line in g:
+        if isinstance(line, bytes):
+            line = line.decode("utf-8") 
         # filter out header and lines with ignore phrases
         if not is_header(line) and is_considered(line, ignore_phrases):
             fields = line.strip().split('\t')
